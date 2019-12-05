@@ -1,0 +1,12 @@
+runMode: release
+logfile: logs/gin.log
+metricfile: logs/metric.prom
+addr: :8080
+timeout: 1s500ms
+            
+db:         
+  dialect: mysql # sqlite3
+  url: root:ginfra%007@tcp(127.0.0.1:33060)/test?charset=utf8&parseTime=True&loc=Local&timeout=10s&readTimeout=30s&writeTimeout=60s # /tmp/gorm.db
+  maxopenconns: 100
+  maxidleconns: 10
+  logmode: true
