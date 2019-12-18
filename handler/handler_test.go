@@ -2,12 +2,14 @@ package handler
 
 import (
 	"errors"
-	mw "ginfra/middleware"
-	"ginfra/datasource"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 	"time"
+
+	"ginfra/datasource"
+	"ginfra/log"
+	mw "ginfra/middleware"
 
 	. "github.com/agiledragon/gomonkey"
 	"github.com/gavv/httpexpect"
@@ -31,7 +33,7 @@ func init() {
 	}
 
 	// New Zap logger
-	logger := mw.NewLogger("ginfra", "/tmp/gin.log", "info")
+	logger := log.NewLogger("ginfra", "/tmp/gin.log", "info")
 
 	// Routes and Middlewares.
 	g.Use(mw.ContextLogger(logger))

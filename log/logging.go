@@ -92,6 +92,8 @@ func (log *LoggerWrap) WithGinContext(c *gin.Context) *LoggerWrap {
 
 func (log *LoggerWrap) WithContext(c context.Context) *LoggerWrap {
 	var l *zap.Logger
+	l = log.Logger
+
 	// with custom log fields
 	if ctxLoggerFields, ok := c.Value(CtxLoggerFields).(map[string]string); ok {
 		for loggerField := range ctxLoggerFields {

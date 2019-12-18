@@ -87,7 +87,6 @@ func Metric() gin.HandlerFunc {
 			zap.String("method", c.Request.Method),
 			zap.String("path", path),
 			zap.String("query", query),
-			zap.String("ip", c.ClientIP()),
 			zap.String("user-agent", c.Request.UserAgent()),
 			zap.String("etime", tEnd.Format(time.RFC3339)),
 			zap.Duration("latency", latency),

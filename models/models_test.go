@@ -8,7 +8,7 @@ import (
 	"testing"
 
 	"ginfra/datasource"
-	
+
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/jinzhu/gorm"
 	"github.com/smartystreets/goconvey/convey"
@@ -37,7 +37,7 @@ func Test_GetPostById(t *testing.T) {
 	)
 
 	mock.ExpectQuery(regexp.QuoteMeta(
-		"SELECT * FROM `posts` WHERE `posts`.`deleted_at` IS NULL AND ((id = ?)) ORDER BY `posts`.`id` ASC LIMIT 1")).
+		"SELECT * FROM `post` WHERE `post`.`deleted_at` IS NULL AND ((id = ?)) ORDER BY `post`.`id` ASC LIMIT 1")).
 		WithArgs(id).
 		WillReturnRows(sqlmock.NewRows([]string{"title", "body", "view"}).
 			AddRow(title, body, view))
