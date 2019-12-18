@@ -1,7 +1,7 @@
 package handler
 
 import (
-	mw "ginfra/middleware"
+	"ginfra/log"
 	"net/http"
 	"time"
 
@@ -32,7 +32,7 @@ func TimedHandler(c *gin.Context) {
 		// so don't return anything
 		case <-ctx.Done():
 			c.AbortWithStatus(http.StatusGatewayTimeout)
-			mw.Logger(c).Info("timeout, terminate sub goroutine...")
+			log.Logger.WithGinContext(c).Info("timeout, terminate sub goroutine...")
 			return
 
 		// use timer to simulate I/O or logical opertion
@@ -52,7 +52,7 @@ func TimedHandler(c *gin.Context) {
 	// so don't return anything
 	case <-ctx.Done():
 		c.AbortWithStatus(http.StatusGatewayTimeout)
-		mw.Logger(c).Info("timeout")
+		log.Logger.WithGinContext(c).Info("timeout")
 		return
 
 	// if the request finished then finish the request by

@@ -1,4 +1,4 @@
-package middleware
+package log
 
 var CtxLoggerKey = "X-Logger"
 var CtxRequestID = "X-Request-Id"

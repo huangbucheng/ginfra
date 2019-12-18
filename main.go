@@ -3,17 +3,18 @@ package main
 import (
 	"context"
 	"fmt"
-	"ginfra/config"
-	"ginfra/datasource"
-	mw "ginfra/middleware"
-	"ginfra/models"
-	"ginfra/router"
-	"log"
 	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
 	"time"
+
+	"ginfra/config"
+	"ginfra/datasource"
+	"ginfra/log"
+	mw "ginfra/middleware"
+	"ginfra/models"
+	"ginfra/router"
 
 	"github.com/gin-gonic/gin"
 )
@@ -43,7 +44,7 @@ func main() {
 	gin.DisableConsoleColor()
 
 	// New Zap logger
-	logger := mw.NewLogger("ginfra", cfg.GetString("logfile"), "debug")
+	logger := log.NewLogger("ginfra", cfg.GetString("logfile"), "debug")
 	defer logger.Sync()
 
 	// Create the Gin engine.
@@ -70,7 +71,7 @@ func main() {
 	go func() {
 		// service connections
 		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
-			log.Fatalf("listen: %s\n", err)
+			logger.Fatal(err.Error())
 		}
 	}()
 
@@ -82,17 +83,16 @@ func main() {
 	// kill -9 is syscall.SIGKILL but can't be catch, so don't need add it
 	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
 	<-quit
-	log.Println("Shutdown Server ...")
+	logger.Info("Shutdown Server ...")
 
 	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Second)
 	defer cancel()
 	if err := srv.Shutdown(ctx); err != nil {
-		log.Fatal("Server Shutdown:", err)
+		logger.Fatal(err.Error())
 	}
 	// catching ctx.Done(). timeout of 5 seconds.
 	select {
 	case <-ctx.Done():
-		log.Println("timeout of 5 seconds.")
 	}
-	log.Println("Server exiting")
+	logger.Info("Server exiting")
 }

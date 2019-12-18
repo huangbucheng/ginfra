@@ -1,8 +1,9 @@
 package handler
 
 import (
-	mw "ginfra/middleware"
 	"net/http"
+
+	"ginfra/log"
 
 	"github.com/gin-gonic/gin"
 	"github.com/imroc/req"
@@ -11,13 +12,13 @@ import (
 func UseHttpClient(c *gin.Context) {
 	resp, err := req.Get("http://localhost", req.Param{"name": "roc", "age": "22"})
 	if err != nil {
-		mw.Logger(c).Error(err.Error())
+		log.Logger.WithGinContext(c).Error(err.Error())
 		c.String(http.StatusInternalServerError, err.Error())
 		return
 	}
 
 	body, _ := resp.ToString()
-	mw.Logger(c).Info(body)
+	log.Logger.WithGinContext(c).Info(body)
 
 	c.String(http.StatusOK, "success")
 }

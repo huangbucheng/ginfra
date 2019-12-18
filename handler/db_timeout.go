@@ -5,7 +5,7 @@ import (
 	"time"
 
 	"ginfra/datasource"
-	mw "ginfra/middleware"
+	"ginfra/log"
 	"ginfra/models"
 
 	"github.com/gin-gonic/gin"
@@ -19,10 +19,10 @@ func DBTimedHandler(c *gin.Context) {
 	db, _ := datasource.GormWithContext(ctx)
 	var post models.Post
 
-	mw.Logger(c).Info("begin sql...")
+	log.Logger.WithGinContext(c).Info("begin sql...")
 	rand.Seed(time.Now().UnixNano())
 	err := db.First(&post, "id = ?", rand.Intn(10000)).Error
-	mw.Logger(c).Info("end sql...")
+	log.Logger.WithGinContext(c).Info("end sql...")
 	c.String(200, err.Error())
 	return
 }

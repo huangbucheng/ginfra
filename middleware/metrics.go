@@ -4,6 +4,8 @@ import (
 	"strconv"
 	"time"
 
+	"ginfra/log"
+
 	"github.com/gin-gonic/gin"
 	"github.com/prometheus/client_golang/prometheus"
 	"go.uber.org/zap"
@@ -94,10 +96,10 @@ func Metric() gin.HandlerFunc {
 		if len(c.Errors) > 0 {
 			// Append error field if this is an erroneous request.
 			for _, e := range c.Errors.Errors() {
-				Logger(c).Error(e, fields...)
+				log.Logger.WithGinContext(c).Error(e, fields...)
 			}
 		} else {
-			Logger(c).Info("summary", fields...)
+			log.Logger.WithGinContext(c).Info("summary", fields...)
 		}
 	}
 }
