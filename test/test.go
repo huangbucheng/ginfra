@@ -14,7 +14,7 @@ import (
 
 func testReadFile() {
 	url := "http://www.golang-book.com/public/pdf/gobook.pdf"
-	url = "https://ai-arena-1258274959.cos.ap-shanghai.myqcloud.com/relay_file/SH-AI-Arena-2021/20210709/35785/%E6%88%91%E7%9A%84AI_%E7%94%B5%E8%84%91AI.gz"
+	url = "https://test-bucket.cos.ap-shanghai.myqcloud.com/test.gz"
 	cont, err := utils.ReadFile(url)
 	fmt.Println("err:", err)
 	fmt.Println("len(file):", len(cont))
