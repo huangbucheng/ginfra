@@ -1,4 +1,4 @@
-package utils
+package prom
 
 import (
 	"strconv"
@@ -42,18 +42,21 @@ var QueryError = prometheus.NewCounterVec(
 	[]string{"appid", "action", "error"},
 )
 
+//SearchCountInc -
 func SearchCountInc(appid uint64) {
 	SearchCount.With(prometheus.Labels{
 		"appid": strconv.FormatUint(appid, 10),
 	}).Inc()
 }
 
+//SearchDurationObserve -
 func SearchDurationObserve(appid uint64, begin time.Time) {
 	SearchDuration.With(prometheus.Labels{
 		"appid": strconv.FormatUint(appid, 10),
 	}).Observe(float64(time.Since(begin)) / float64(time.Second))
 }
 
+//QueryErrorInc -
 func QueryErrorInc(appid uint64, action string, err error) {
 	QueryError.With(prometheus.Labels{
 		"appid":  strconv.FormatUint(appid, 10),

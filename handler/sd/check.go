@@ -45,7 +45,8 @@ func DiskCheck(c *gin.Context) {
 		text = "WARNING"
 	}
 
-	message := fmt.Sprintf("%s - Free space: %dMB (%dGB) / %dMB (%dGB) | Used: %d%%", text, usedMB, usedGB, totalMB, totalGB, usedPercent)
+	message := fmt.Sprintf("%s - Free space: %dMB (%dGB) / %dMB (%dGB) | Used: %d%%",
+		text, usedMB, usedGB, totalMB, totalGB, usedPercent)
 	c.String(status, "\n"+message)
 }
 
@@ -94,6 +95,7 @@ func RAMCheck(c *gin.Context) {
 		text = "WARNING"
 	}
 
-	message := fmt.Sprintf("%s - Free space: %dMB (%dGB) / %dMB (%dGB) | Used: %d%%", text, usedMB, usedGB, totalMB, totalGB, usedPercent)
+	message := fmt.Sprintf("%s - Free space: %dMB (%dGB) / %dMB (%dGB) | Used: %d%%",
+		text, usedMB, usedGB, totalMB, totalGB, usedPercent)
 	c.String(status, "\n"+message)
 }

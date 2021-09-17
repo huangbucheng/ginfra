@@ -2,6 +2,7 @@ package log
 
 var CtxLoggerKey = "X-Logger"
 var CtxRequestID = "X-Request-Id"
+var CtxClientIP = "X-Forwarded-For"
 
 var CtxProductID = "X-Product-ID"       // 机器人ID
 var CtxLoggerFields = "X-Logger-Fields" // 自定义日志字段集，map[string]string

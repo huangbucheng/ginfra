@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"strings"
 	"syscall"
 	"time"
 
@@ -16,26 +17,40 @@ import (
 	"ginfra/models"
 	"ginfra/router"
 
+	"gorm.io/gorm/logger"
+
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
+	"github.com/spf13/pflag"
 )
 
 func main() {
+	pflag.Parse()
+
 	// init config
 	cfg, err := config.Parse("")
 	if err != nil {
 		panic(err)
 	}
 
-	// init DB
-	fmt.Println(cfg.GetString("db.dialect"), cfg.GetString("db.url"))
-	db, err := datasource.InitGormDB(cfg.GetString("db.dialect"), cfg.GetString("db.url"),
-		cfg.GetInt("db.maxopenconns"), cfg.GetInt("db.maxidleconns"), cfg.GetBool("db.logmode"))
-	if err != nil {
-		panic(err)
+	if len(cfg.GetString("db.url")) > 0 {
+		// init DB
+		fmt.Println(cfg.GetString("db.dialect"), cfg.GetString("db.url"))
+		var lv logger.LogLevel = logger.Silent
+		if cfg.GetBool("db.logmode") {
+			lv = logger.Info
+		}
+		db, err := datasource.InitDefaultGormDBv2(cfg.GetString("db.url"),
+			cfg.GetInt("db.maxopenconns"), cfg.GetInt("db.maxidleconns"), lv)
+		if err != nil {
+			panic(err)
+		}
+		db.Set("gorm:table_options", "ENGINE=InnoDB").AutoMigrate(
+			&models.Post{},
+			&models.Tag{},
+			&models.PostTag{},
+		)
 	}
-	db.AutoMigrate(&models.Post{}, &models.Tag{}, &models.PostTag{})
-	db.Model(&models.PostTag{}).AddUniqueIndex("uk_post_tag", "post_id", "tag_id")
-	defer db.Close()
 
 	// Set gin mode.
 	gin.SetMode(cfg.GetString("runmode"))
@@ -44,7 +59,8 @@ func main() {
 	gin.DisableConsoleColor()
 
 	// New Zap logger
-	logger := log.NewLogger("ginfra", cfg.GetString("logfile"), "debug")
+	logger := log.NewZapLogger("ginfra", cfg.GetString("logfile"), "debug")
+	log.ZLog = logger
 	defer logger.Sync()
 
 	// Create the Gin engine.
@@ -57,6 +73,18 @@ func main() {
 		mw.ContextLogger(logger),
 		// Middlwares. Request time out
 		mw.Timeout(cfg.GetDuration("timeout")),
+		// cors
+		cors.New(cors.Config{
+			AllowOrigins:     cfg.GetStringSlice("cors.origins"),
+			AllowMethods:     []string{"GET", "POST", "PUT", "PATCH", "DELETE", "HEAD"},
+			AllowHeaders:     []string{"*"},
+			ExposeHeaders:    []string{"Content-Length"},
+			AllowCredentials: true,
+			AllowOriginFunc: func(origin string) bool {
+				return strings.HasSuffix(origin, "qq.com")
+			},
+			MaxAge: 12 * time.Hour,
+		}),
 	)
 
 	srv := &http.Server{

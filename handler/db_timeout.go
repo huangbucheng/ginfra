@@ -11,6 +11,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+//DBTimedHandler 示例
 func DBTimedHandler(c *gin.Context) {
 
 	// get the underlying request context
@@ -19,10 +20,10 @@ func DBTimedHandler(c *gin.Context) {
 	db, _ := datasource.GormWithContext(ctx)
 	var post models.Post
 
-	log.Logger.WithGinContext(c).Info("begin sql...")
+	log.WithGinContext(c).Info("begin sql...")
 	rand.Seed(time.Now().UnixNano())
 	err := db.First(&post, "id = ?", rand.Intn(10000)).Error
-	log.Logger.WithGinContext(c).Info("end sql...")
+	log.WithGinContext(c).Info("end sql...")
 	c.String(200, err.Error())
 	return
 }

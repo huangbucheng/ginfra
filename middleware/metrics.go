@@ -39,6 +39,7 @@ func init() {
 	// GRegistry.Register(prometheus.NewGoCollector())
 }
 
+//DumpPromMetrics -
 func DumpPromMetrics(filename string) {
 	// Write metrics to files
 	prometheus.WriteToTextfile(filename, GRegistry)
@@ -62,7 +63,7 @@ func Metric() gin.HandlerFunc {
 		query := c.Request.URL.RawQuery
 		c.Next()
 
-		if path == "/metrics" {
+		if path == "/metrics" || path == "/" {
 			return
 		}
 
@@ -95,10 +96,10 @@ func Metric() gin.HandlerFunc {
 		if len(c.Errors) > 0 {
 			// Append error field if this is an erroneous request.
 			for _, e := range c.Errors.Errors() {
-				log.Logger.WithGinContext(c).Error(e, fields...)
+				log.WithGinContext(c).Error(e, fields...)
 			}
 		} else {
-			log.Logger.WithGinContext(c).Info("summary", fields...)
+			log.WithGinContext(c).Info("summary", fields...)
 		}
 	}
 }

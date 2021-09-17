@@ -1,8 +1,34 @@
 runMode: release
-logfile: logs/gin.log
-metricfile: logs/metric.prom
+logfile: ../logs/gin.log
+metricfile: ../logs/metric.prom
 addr: :8080
 timeout: 1s500ms
+
+jwt:
+  jwtissuer: ginfra
+  jwtexpires: 604800 # 7 * 24 * 3600
+  RS256KeyDir: ../jwt/
+  domain: .qq.com
+
+cors:
+  origins:
+  - https://www.qq.com/
+
+wx:
+  SignatureToken: xxxx
+
+tcb:
+  secretId: xxxx
+  secretKey: xxxx
+
+cos:
+  BucketURL: https://xxxx.cos.ap-shanghai.myqcloud.com
+  SecretID: xxxx
+  SecretKey: xxxx
+
+qcloud:
+  SecretID: xxxx
+  SecretKey: xxxx
             
 db:         
   dialect: mysql # sqlite3

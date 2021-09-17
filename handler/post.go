@@ -1,12 +1,15 @@
 package handler
 
 import (
-	"ginfra/models"
 	"net/http"
+
+	"ginfra/datasource"
+	"ginfra/models"
 
 	"github.com/gin-gonic/gin"
 )
 
+//PostCreate 示例
 func PostCreate(c *gin.Context) {
 	// tags := c.PostForm("tags")
 	title := c.PostForm("title")
@@ -19,7 +22,9 @@ func PostCreate(c *gin.Context) {
 		Body:        body,
 		IsPublished: published,
 	}
-	err := post.Insert(c.Request.Context())
+
+	db, _ := datasource.Gormv2(c.Request.Context())
+	err := post.Insert(db)
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{
 			"Response": gin.H{
@@ -40,15 +45,18 @@ func PostCreate(c *gin.Context) {
 	})
 }
 
+//PostGet 示例
 func PostGet(c *gin.Context) {
 	id := c.Param("id")
-	post, err := models.GetPostById(c.Request.Context(), id)
+	db, _ := datasource.Gormv2(c.Request.Context())
+
+	post, err := models.GetPostById(db, id)
 	if err != nil || !post.IsPublished {
 		c.AbortWithStatus(http.StatusNoContent)
 		return
 	}
 	post.View++
-	post.UpdateView(c.Request.Context())
+	post.UpdateView(db)
 	c.JSON(http.StatusOK, gin.H{
 		"Response": gin.H{
 			"Message": "success",

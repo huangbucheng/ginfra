@@ -1,16 +1,18 @@
 package router
 
 import (
+	"net/http"
+
 	"ginfra/handler"
 	"ginfra/handler/sd"
 	mw "ginfra/middleware"
-	"net/http"
 
 	"github.com/gin-contrib/pprof"
 	"github.com/gin-gonic/gin"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
+//New new router
 func New(handlers ...gin.HandlerFunc) *gin.Engine {
 	// Create the Gin engine.
 	g := gin.New()
@@ -58,19 +60,17 @@ func load(g *gin.Engine) {
 		svcd.GET("/ram", sd.RAMCheck)
 	}
 
+	gapi := g.Group("/api/v1")
+	{
+		gapi.GET("/wx", handler.WXCheckSignature)
+		gapi.POST("/wx", handler.WXMsgReceive)
+		gapi.POST("/JsonMsgReceive", handler.JsonMsgReceive)
+		gapi.POST("/Upload", handler.Upload)
+	}
+
 	// User handlers
 	g.GET("/ping", handler.Ping)
-	g.GET("/timeout", handler.TimedHandler)
-	g.GET("/dbtimeout", handler.DBTimedHandler)
-
-	// curl -X POST -H 'content-type: application/x-www-form-urlencoded' -d 'value=abc' "http://127.0.0.1:21000/TagCreate"
-	// g.POST("/TagCreate", handler.TagCreate)
-	// curl -X POST -H 'content-type: application/x-www-form-urlencoded' -d 'tags=abc&title=First Post&body=balabala...&isPublished=on' "http://127.0.0.1:21000/PostCreate"
-	g.POST("/PostCreate", handler.PostCreate)
-	// curl "http://127.0.0.1:21000/TagGet?tag=abc"
-	// g.GET("/TagGet", handler.TagGet)
-	// curl "http://127.0.0.1:21000/UseHttpClient"
-	g.GET("/UseHttpClient", handler.UseHttpClient)
-
-	return
+	//g.GET("/timeout", handler.TimedHandler)
+	//g.GET("/dbtimeout", handler.DBTimedHandler)
+	//g.GET("/UseHttpClient", handler.UseHttpClient)
 }

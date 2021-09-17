@@ -1,0 +1,9 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: np-isolate
+  namespace: test-isolate
+spec:
+  podSelector: {}
+  policyTypes:
+  - Egress

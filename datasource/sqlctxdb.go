@@ -6,9 +6,9 @@ import (
 	"errors"
 
 	"github.com/jinzhu/gorm"
-	_ "github.com/jinzhu/gorm/dialects/mysql"
 )
 
+//GormWithContext -
 func GormWithContext(ctx context.Context) (*gorm.DB, error) {
 	db, err := Gorm()
 	if db == nil {
@@ -25,6 +25,7 @@ func GormWithContext(ctx context.Context) (*gorm.DB, error) {
 	return ctxdb, err
 }
 
+//Gorm -
 func Gorm() (*gorm.DB, error) {
 	if gormDB == nil {
 		return nil, errors.New("DB uninitialized")
@@ -34,6 +35,7 @@ func Gorm() (*gorm.DB, error) {
 
 var gormDB *gorm.DB
 
+//InitGormDB -
 func InitGormDB(dialect, source string, maxopen, maxidle int, logmode bool) (*gorm.DB, error) {
 
 	db, err := gorm.Open(dialect, source)
@@ -48,6 +50,7 @@ func InitGormDB(dialect, source string, maxopen, maxidle int, logmode bool) (*go
 	return nil, err
 }
 
+//SetGormDB -
 func SetGormDB(db *gorm.DB) {
 	gormDB = db
 }
@@ -57,26 +60,32 @@ type sqlCtxDB struct {
 	ctx        context.Context
 }
 
+//Exec -
 func (db *sqlCtxDB) Exec(query string, args ...interface{}) (sql.Result, error) {
 	return db.underlying.ExecContext(db.ctx, query, args...)
 }
 
+//Prepare -
 func (db *sqlCtxDB) Prepare(query string) (*sql.Stmt, error) {
 	return db.underlying.PrepareContext(db.ctx, query)
 }
 
+//Query -
 func (db *sqlCtxDB) Query(query string, args ...interface{}) (*sql.Rows, error) {
 	return db.underlying.QueryContext(db.ctx, query, args...)
 }
 
+//QueryRow -
 func (db *sqlCtxDB) QueryRow(query string, args ...interface{}) *sql.Row {
 	return db.underlying.QueryRowContext(db.ctx, query, args...)
 }
 
+//Begin -
 func (db *sqlCtxDB) Begin() (*sql.Tx, error) {
 	return db.underlying.BeginTx(db.ctx, nil)
 }
 
+//BeginTx -
 func (db *sqlCtxDB) BeginTx(ctx context.Context, opts *sql.TxOptions) (*sql.Tx, error) {
 	return db.underlying.BeginTx(ctx, opts)
 }

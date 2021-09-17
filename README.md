@@ -111,6 +111,8 @@ func TimedHandler(c *gin.Context) {
 {"level":"info","time":"2019-10-15T11:57:31.777+0800","caller":"middleware/metrics.go:65","msg":"/timeout","client_ip":"127.0.0.1","request_id":"d6e4ee5a-b5a9-4389-a6b3-48c679a6b7a4","status":504,"method":"GET","path":"/timeout","query":"","ip":"127.0.0.1","user-agent":"curl/7.29.0","etime":"2019-10-15T11:57:31+08:00","latency":2.000209287}
 ```
 # GORM
+Gorm v2: 以支持context。
+Gorm v1:
 通过将sql db与context绑定，传入gorm DB中，即可实现gorm调用sql引擎层的时候，将相应api替换为withContext的api，从而实现context timeout能力：
 ```shell
     db, err := datasource.GormWithContext(ctx)
@@ -118,6 +120,36 @@ func TimedHandler(c *gin.Context) {
         return nil, err 
     } 
 ```
+
+# 集成能力
+## AES 加解密
+## CSRF Token
+业务服务下发ginfra生成的CSRF Token（AES加密），并可以到ginfra校验CSRF Token。
+## JWT Token
+JWT Token with RS256 or HS256。
+HS256: 在middleware中使用了该版本。
+RS256: 云开发的Ticket签发和Discuz的Token使用了该版本。（非对称加密）
+## 腾讯云云开发
+1. 对接腾讯云云开发自定义登录，将登录态信息通过JWT With RS256签发Ticket。
+2. 实现腾讯云云开发OpenAPI签名逻辑，以及操作云开发数据库的接口。
+
+## 腾讯云人脸融合
+## 腾讯云COS
+## 微信授权登录
+实现了授权登录流程相关接口
+## 微信公众号开发
+1. 实现了微信公众号相关接口：下发JS SDK Config
+2. 实现了接收微信公众号上行消息接口（可以用来实现微信消息发弹幕）
+## QQ授权登录
+## 集成Discuz！Q的论坛功能
+1. 业务系统自动管理用户的Discuz帐号，包括自动创建和帐号映射，并且签发Discuz的登录态Token。
+## Kubernetes Job
+1. 通过API Server创建Kubernetes Job实现用户任务的执行和环境隔离。
+
+## cgroup 对进程进行隔离和资源控制
+## 文件操作封装
+## UID封装
+## Sigmoid
 
 # 单元测试
 ## hander测试

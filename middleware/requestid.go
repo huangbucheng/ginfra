@@ -4,9 +4,10 @@ import (
 	"ginfra/log"
 
 	"github.com/gin-gonic/gin"
-	uuid "github.com/satori/go.uuid"
+	"github.com/google/uuid"
 )
 
+//RequestId middleware
 func RequestId() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		// Check for incoming header, use it if exists
@@ -14,7 +15,7 @@ func RequestId() gin.HandlerFunc {
 
 		// Create request id with UUID4
 		if requestId == "" {
-			u4 := uuid.NewV4()
+			u4 := uuid.New()
 			requestId = u4.String()
 		}
 
@@ -27,6 +28,7 @@ func RequestId() gin.HandlerFunc {
 	}
 }
 
+//GetRequestId -
 func GetRequestId(c *gin.Context) string {
 	if ctxReqId, ok := c.Value(log.CtxRequestID).(string); ok {
 		return ctxReqId

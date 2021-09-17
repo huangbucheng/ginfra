@@ -1,7 +1,7 @@
 package config
 
 import (
-	"fmt"
+	"os"
 	"path"
 	"strings"
 	"sync"
@@ -11,9 +11,10 @@ import (
 )
 
 var (
-	cfg = pflag.StringP("config", "c", "", "apiserver config file path.")
+	cfg = pflag.StringP("config", "c", "../conf/config.yaml", "apiserver config file path.")
 )
 
+//Config 配置实例
 type Config struct {
 	Name string
 	*viper.Viper
@@ -24,22 +25,36 @@ var (
 	cfgMapMu sync.Mutex
 )
 
-func Unmarshal(c interface{}, filename string) error {
+func init() {
+	for _, arg := range os.Args {
+		if arg == "-h" || arg == "--help" {
+			return
+		}
+	}
+	pflag.CommandLine.ParseErrorsWhitelist.UnknownFlags = true
+	pflag.Parse()
+}
+
+//UnmarshalKey 从配置中解析key的值
+func UnmarshalKey(key string, c interface{}, filename string) error {
 	v, err := Parse(filename)
 	if err != nil {
-		panic(fmt.Errorf("error loading config:%s \n", err))
+		//panic(fmt.Errorf("error loading config:%s", err))
+		return err
 	}
-	err = v.Unmarshal(&c)
+	err = v.UnmarshalKey(key, c)
 	if err != nil {
 		return err
 	}
 	return nil
 }
 
+//Parse 解析配置文件
 func Parse(filename string) (*Config, error) {
 	return parse(filename, true)
 }
 
+//ParseWithoutWatch 解析配置文件，不监听配置文件变化
 func ParseWithoutWatch(filename string) (*Config, error) {
 	return parse(filename, false)
 }
@@ -49,11 +64,7 @@ func parse(filename string, watch bool) (*Config, error) {
 	defer cfgMapMu.Unlock()
 
 	if filename == "" {
-		pflag.Parse()
 		filename = *cfg
-	}
-	if filename == "" {
-		filename = "../conf/config.yaml"
 	}
 
 	if v, ok := cfgMap[filename]; ok {
@@ -79,16 +90,22 @@ func parse(filename string, watch bool) (*Config, error) {
 func (c *Config) loadConfig() error {
 	c.SetConfigType(path.Ext(path.Base(c.Name))[1:])
 	c.SetConfigFile(c.Name)
+
+	c.LoadEnv("") // 读取匹配的环境变量
+
 	if err := c.ReadInConfig(); err != nil { // viper解析配置文件
 		return err
 	}
 	return nil
 }
 
+//LoadEnv 加载环境变量
 func (c *Config) LoadEnv(prefix string) {
-	c.AutomaticEnv()       // 读取匹配的环境变量
-	c.SetEnvPrefix(prefix) // 读取环境变量的前缀
+	c.AutomaticEnv() // 读取匹配的环境变量
+	if len(prefix) > 0 {
+		c.SetEnvPrefix(prefix) // 读取环境变量的前缀
+	}
 
-	replacer := strings.NewReplacer(".", "_")
-	c.SetEnvKeyReplacer(replacer)
+	// exp. for key db.url, set env with name DB_URL
+	c.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
 }

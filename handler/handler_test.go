@@ -33,7 +33,7 @@ func init() {
 	}
 
 	// New Zap logger
-	logger := log.NewLogger("ginfra", "/tmp/gin.log", "info")
+	logger := log.NewZapLogger("ginfra", "/tmp/gin.log", "info")
 
 	// Routes and Middlewares.
 	g.Use(mw.ContextLogger(logger))

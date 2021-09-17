@@ -1,6 +1,6 @@
 .PHONY: all test clean
 
-all: ./bin/ginfra
+all: clean ./bin/ginfra
 
 ./bin/ginfra:
 	go build -o ./bin/ginfra
