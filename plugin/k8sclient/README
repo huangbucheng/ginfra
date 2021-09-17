@@ -8,5 +8,5 @@ https://kubernetes.io/zh/docs/tasks/run-application/access-api-from-pod/
 ## 3.1 设置隔离Pod的NetworkPolicy：参考networkpolicy.yaml
 ## 3.2 启动隔离Pod的容器：
     - 挂载集群凭证
-    - echo "172.16.0.10 cls-5qr8dttk.ccs.tencent-cloud.com" >> /etc/hosts
+    - echo "172.16.0.10 cls-xxxx.ccs.tencent-cloud.com" >> /etc/hosts
     - 通过exp.KubeClient创建资源（Job...）或查看资源
