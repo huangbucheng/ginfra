@@ -14,8 +14,8 @@ import (
 
 //UploadRequest
 type UploadRequest struct {
-	ActivityID     string                `form:"ActivityID", binding:"required,min=1"`
-	InvitationFile *multipart.FileHeader `form:"InvitationFile"`
+	FileID      string                `form:"FileID" binding:"required,min=1"`
+	FileContent *multipart.FileHeader `form:"FileContent"`
 }
 
 //UploadResponse
@@ -32,11 +32,12 @@ func Upload(c *gin.Context) {
 		return
 	}
 
-	if req.InvitationFile != nil {
-		content, err := ReadUploadedFile(req.InvitationFile)
+	log.WithGinContext(c).Debug(req.FileID)
+	if req.FileContent != nil {
+		content, err := ReadUploadedFile(req.FileContent)
 		if err != nil {
 			log.WithGinContext(c).Error(err.Error(), zap.String("error", errcode.ErrCodeInternalError))
-			protocol.SetErrResponse(c, errcode.NewCustomError(errcode.ErrCodeInternalError, "读取文件失败"))
+			protocol.SetErrResponse(c, errcode.NewCustomError(errcode.ErrCodeInternalError, "解析文件失败"))
 			return
 		}
 		log.WithGinContext(c).Debug(string(content))

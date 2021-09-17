@@ -1,4 +1,4 @@
-package utils
+package tencent
 
 import (
 	"context"
@@ -9,6 +9,7 @@ import (
 	"sync"
 
 	"ginfra/config"
+	"ginfra/utils"
 	"github.com/tencentyun/cos-go-sdk-v5"
 )
 
@@ -81,4 +82,20 @@ func GetFileFromCos(cosurl string) (string, error) {
 		return "", err
 	}
 	return string(body), nil
+}
+
+//ReadFile 读取文件内容，支持COS、HTTP、HTTPS、本地文件
+func ReadFile(logfile string) (string, error) {
+	// try cos
+	if len(CosBucketUrl) > 0 && strings.HasPrefix(logfile, CosBucketUrl) {
+		if len(CosSecretKey) > 0 {
+			body, err := GetFileFromCos(logfile)
+			if err != nil {
+				return "", err
+			}
+			return body, nil
+		}
+	}
+
+	return utils.ReadFile(logfile)
 }

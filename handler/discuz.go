@@ -51,7 +51,7 @@ func GetDiscuzToken(c *gin.Context) {
 	}
 
 	// get discuz uid
-	// discuz register: http://127.0.0.1:8080/apiv3/users/username.register
+	// discuz register: http://127.0.0.1:8090/apiv3/users/username.register
 	//	POST Content-Type: application/json; charset=utf-8
 	// {"username":"abc","password":"xxxx","nickname":"bob","passwordConfirmation":"xxxx","captchaRandStr":"","captchaTicket":"","code":""}
 

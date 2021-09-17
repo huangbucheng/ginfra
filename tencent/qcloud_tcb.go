@@ -1,4 +1,4 @@
-package utils
+package tencent
 
 import (
 	"crypto/hmac"
@@ -36,8 +36,6 @@ var (
 	host      string = "tcb-api.tencentcloudapi.com"
 	secretId  string
 	secretKey string
-	//envId      string //= "ai-arena-4gfpsmhn2217a420"
-	//collection string //= "shanghai-2021-live-bullet"
 )
 
 func init() {
@@ -48,8 +46,6 @@ func init() {
 		panic(err)
 	}
 
-	//envId = cfg.GetString("tcb.envId")
-	//collection = cfg.GetString("tcb.collection")
 	secretId = cfg.GetString("tcb.secretId")
 	secretKey = cfg.GetString("tcb.secretKey")
 }

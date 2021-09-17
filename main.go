@@ -16,7 +16,6 @@ import (
 	mw "ginfra/middleware"
 	"ginfra/models"
 	"ginfra/router"
-
 	"gorm.io/gorm/logger"
 
 	"github.com/gin-contrib/cors"

@@ -9,7 +9,7 @@ import (
 	"ginfra/config"
 	"ginfra/log"
 	"ginfra/protocol"
-	"ginfra/utils"
+	"ginfra/tencent"
 )
 
 var cfg *config.Config
@@ -30,7 +30,7 @@ func WXCheckSignature(c *gin.Context) {
 	echostr := c.Query("echostr")
 
 	Token := cfg.GetString("wx.SignatureToken")
-	ok := utils.CheckWxOffiAcctSignature(signature, timestamp, nonce, Token)
+	ok := tencent.CheckWxOffiAcctSignature(signature, timestamp, nonce, Token)
 	if !ok {
 		log.WithGinContext(c).Error("微信公众号接入校验失败!")
 		return
@@ -71,7 +71,7 @@ func WXMsgReceive(c *gin.Context) {
 	}
 	b, _ := json.Marshal(lb)
 
-	utils.InsertDocuments("test-envid", "test-collection", [][]byte{b})
+	tencent.InsertDocuments("env-id", "test-collection", [][]byte{b})
 }
 
 //LiveBullet 示例
@@ -108,7 +108,7 @@ func JsonMsgReceive(c *gin.Context) {
 	}
 	b, _ := json.Marshal(lb)
 
-	ids, err := utils.InsertDocuments("test-envid", "test-collection", [][]byte{b})
+	ids, err := tencent.InsertDocuments("env-id", "test-collection", [][]byte{b})
 	if err != nil {
 		protocol.SetErrResponse(c, err)
 		return

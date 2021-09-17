@@ -1,4 +1,4 @@
-package utils
+package tencent
 
 import (
 	"encoding/base64"

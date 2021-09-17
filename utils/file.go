@@ -152,19 +152,8 @@ func ReadNLinesFromString(content string, n int) ([]string, error) {
 	return lines, nil
 }
 
-//ReadFile 读取文件内容，支持COS、HTTP、HTTPS、本地文件
+//ReadFile 读取文件内容，支持HTTP、HTTPS、本地文件
 func ReadFile(logfile string) (string, error) {
-	// try cos
-	if strings.HasPrefix(logfile, CosBucketUrl) {
-		if len(CosSecretKey) > 0 {
-			body, err := GetFileFromCos(logfile)
-			if err != nil {
-				return "", err
-			}
-			return string(body), nil
-		}
-	}
-
 	// http url
 	if strings.HasPrefix(logfile, "http://") || strings.HasPrefix(logfile, "https://") {
 		client := http.Client{

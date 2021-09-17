@@ -58,7 +58,7 @@ type ServiceRequest struct {
 type VolumeMount struct {
 	Name      string
 	MountPath string // /usr/local/service/runner/code
-	HostPath  string // /tmp/arena/test
+	HostPath  string // /tmp/test
 }
 
 func (c *KubeClient) WithKubeConfig(kubeconfigPath string) error {

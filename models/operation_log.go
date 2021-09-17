@@ -29,13 +29,13 @@ func (s *OperationLog) AutoMigrate(db *gorm.DB) error {
 	return db.Scopes(OperationLogTable(s)).AutoMigrate(&OperationLog{})
 }
 
-//Insert
+//Insert 插入操作日志
 func (s *OperationLog) Insert(db *gorm.DB) error {
 	return db.Scopes(OperationLogTable(s)).Create(s).Error
 	//return db.Create(s).Error
 }
 
-//Delete
+//Delete 軟刪除操作日志
 func (s *OperationLog) Delete(db *gorm.DB) error {
 	return db.Scopes(OperationLogTable(s)).Delete(s).Error
 }
