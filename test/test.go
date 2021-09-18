@@ -17,7 +17,6 @@ import (
 	"ginfra/plugin/k8sclient"
 	"ginfra/tencent"
 	"ginfra/utils"
-
 	"github.com/spf13/pflag"
 	"github.com/tencentyun/cos-go-sdk-v5"
 )
@@ -194,15 +193,52 @@ func test_sts() {
 	}
 }
 
-func test_getQQDocsToken() {
-	resp, err := tencent.QQDocsToken("xxxx", "xxxx",
-		"https://www.qq.com", "xxxx")
-	if err != nil {
-		fmt.Println(err)
-		return
+func test_QQDocs() {
+	appid := ""
+	appsecret := ""
+	redirecturl := "https://www.qq.com"
+	code := ""
+	encodedID := ""
+	fileID := ""
+
+	openid := ""
+	access_token := ""
+	if len(access_token) == 0 {
+		// Step 1. get access token
+		resp, err := tencent.QQDocsToken(appid, appsecret, redirecturl, code)
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
+		logstr, _ := json.Marshal(resp)
+		fmt.Println(string(logstr))
+
+		openid = resp.OpenID
+		access_token = resp.AccessToken
 	}
-	logstr, _ := json.Marshal(resp)
-	fmt.Println(string(logstr))
+
+	// Step 2. convert encodedid -> fileid
+	{
+		resp2, err := tencent.QQDocsConverter(appid, access_token, openid, encodedID, 2)
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
+		logstr, _ := json.Marshal(resp2)
+		fmt.Println(string(logstr))
+		fileID = resp2.Data.FileID
+	}
+
+	// Step 3. get temp url
+	{
+		resp3, err := tencent.QueryQQDocsTempUrl(appid, access_token, openid, fileID)
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
+		logstr, _ := json.Marshal(resp3)
+		fmt.Println(string(logstr))
+	}
 }
 
 func testPassword(pwd string) {
@@ -271,5 +307,5 @@ func main() {
 	//fmt.Println(ObscureString("黄生"))
 	//testMapIter()
 	//test_sts()
-	test_getQQDocsToken()
+	test_QQDocs()
 }
