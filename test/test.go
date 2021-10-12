@@ -9,7 +9,6 @@ import (
 	"net/url"
 	"regexp"
 	"strconv"
-	"time"
 
 	"ginfra/config"
 	"ginfra/handler"
@@ -17,6 +16,7 @@ import (
 	"ginfra/plugin/k8sclient"
 	"ginfra/tencent"
 	"ginfra/utils"
+
 	"github.com/spf13/pflag"
 	"github.com/tencentyun/cos-go-sdk-v5"
 )
@@ -295,8 +295,41 @@ func testMapIter() {
 	}
 }
 
+func testCombination() {
+	input := []string{"A", "B", "C", "D", "E", "F"}
+	cache := make([]string, 3)
+	var results [][]string
+	utils.CombinationString(input, 0, cache, 0, &results)
+	for _, res := range results {
+		fmt.Printf("[*]%s %s %s\n", res[0], res[1], res[2])
+	}
+}
+
+func testPermuteString() {
+	input := []string{"A", "B", "C", "D"}
+	results := utils.PermuteString(input)
+	fmt.Printf("[+]Total: %d\n", len(results))
+	for _, res := range results {
+		fmt.Printf("[*]%s %s %s %s\n", res[0], res[1], res[2], res[3])
+	}
+}
+
+func testShit() {
+	idx := 0
+	fmt.Println(3 << (idx*8 + 0))
+	fmt.Println(3 << (idx*8 + 2))
+	fmt.Println(3 << (idx*8 + 4))
+	fmt.Println(3 << (idx*8 + 6))
+
+	idx = 1
+	fmt.Println(3 << (idx*8 + 0))
+	fmt.Println(3 << (idx*8 + 2))
+	fmt.Println(3 << (idx*8 + 4))
+	fmt.Println(3 << (idx*8 + 6))
+}
+
 func main() {
-	fmt.Println(time.Now().Format(time.RFC3339))
+	//fmt.Println(time.Now().Format(time.RFC3339))
 	// testReadFile()
 	//testMap()
 	//testClaims()
@@ -307,5 +340,8 @@ func main() {
 	//fmt.Println(ObscureString("黄生"))
 	//testMapIter()
 	//test_sts()
-	test_QQDocs()
+	//test_QQDocs()
+	//testCombination()
+	//testPermuteString()
+	testShit()
 }
