@@ -34,7 +34,7 @@ func GetDiscuzToken(c *gin.Context) {
 		return
 	}
 
-	claims, err := getClaimDataFromContext(c)
+	claims, err := getClaimData(c)
 	if err != nil {
 		protocol.SetErrResponse(c, err)
 		return

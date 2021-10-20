@@ -37,6 +37,7 @@ var ErrNoAuthToken = "NoAuthToken"
 var ErrInvalidAuthToken = "InvalidAuthToken"
 var ErrExpiredAuthToken = "ExpiredAuthToken"
 var ErrNoJWTClaims = "NoJWTClaims"
+var ErrInvalidJWTClaims = "InvalidJWTClaims"
 
 //NewCustomError 新建自定义Error
 func NewCustomError(code, message string) *CustomError {

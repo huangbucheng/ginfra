@@ -68,6 +68,12 @@ func load(g *gin.Engine) {
 		gapi.POST("/Upload", handler.Upload)
 	}
 
+	gauth := g.Group("/api/v2")
+	gauth.Use(mw.JWTAuth(handler.HandleClaims))
+	{
+		gauth.POST("/Upload", handler.Upload)
+	}
+
 	// User handlers
 	g.GET("/ping", handler.Ping)
 	//g.GET("/timeout", handler.TimedHandler)

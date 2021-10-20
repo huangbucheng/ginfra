@@ -28,6 +28,7 @@ func CombinationString(input []string, n int, cache []string, k int, results *[]
 	CombinationString(input, n+1, cache, k, results)
 }
 
+//PermuteString 全排列
 func PermuteString(input []string) [][]string {
 	var ans [][]string
 	var dfs func(l []string, temp []string)
@@ -42,4 +43,20 @@ func PermuteString(input []string) [][]string {
 	}
 	dfs(input, []string{})
 	return ans
+}
+
+//Min 取min值
+func Min(x, y int) int {
+	if x < y {
+		return x
+	}
+	return y
+}
+
+//Max 取max值
+func Max(x, y int) int {
+	if x < y {
+		return y
+	}
+	return x
 }

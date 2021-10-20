@@ -9,11 +9,11 @@ import (
 	"net/url"
 	"regexp"
 	"strconv"
+	"time"
 
-	"ginfra/config"
-	"ginfra/handler"
-	"ginfra/models"
+	"ginfra/plugin/atta"
 	"ginfra/plugin/k8sclient"
+	"ginfra/plugin/seewo"
 	"ginfra/tencent"
 	"ginfra/utils"
 
@@ -99,28 +99,28 @@ func testMap() {
 	fmt.Println(val, ok)
 }
 
-func testClaims() {
-	user := &models.UserAuth{
-		Uid:          000001,
-		IdentityType: 5,
-		Identifier:   "7LSDAAEAD989QKJALJDFA",
-	}
-
-	token, err := handler.GenerateToken(user)
-	fmt.Println(token, err)
-
-	cfg, err := config.Parse("")
-	if err != nil {
-		panic(err)
-	}
-
-	// init
-	RS256PublicKey := cfg.GetString("jwt.RS256PublicKey")
-	fmt.Println(RS256PublicKey)
-	claims, err := utils.ParseJWTTokenWithRS256([]byte(RS256PublicKey), token)
-	data, err := handler.GetClaimData(claims)
-	fmt.Println(data, err)
-}
+//func testClaims() {
+//	user := &models.UserAuth{
+//		Uid:          000001,
+//		IdentityType: 5,
+//		Identifier:   "7LSDAAEAD989QKJALJDFA",
+//	}
+//
+//	token, err := handler.GenerateToken(user)
+//	fmt.Println(token, err)
+//
+//	cfg, err := config.Parse("")
+//	if err != nil {
+//		panic(err)
+//	}
+//
+//	// init
+//	RS256PublicKey := cfg.GetString("jwt.RS256PublicKey")
+//	fmt.Println(RS256PublicKey)
+//	claims, err := utils.ParseJWTTokenWithRS256([]byte(RS256PublicKey), token)
+//	data, err := handler.HandleClaims(claims)
+//	fmt.Println(data, err)
+//}
 
 func test_jwt() {
 	claims := make(map[string]interface{})
@@ -328,8 +328,40 @@ func testShit() {
 	fmt.Println(3 << (idx*8 + 6))
 }
 
+func testSeeWo() {
+	if false {
+		resp, err := seewo.GetSeeWoAccessToken(
+			"",
+			"",
+			"",
+		)
+		fmt.Println(err)
+		fmt.Println(resp.Body.AccessToken)
+		fmt.Println(resp.Body.OpenId)
+	}
+
+	if true {
+		resp, err := seewo.GetSeeWoUserInfo(
+			"",
+			"",
+			"",
+			"",
+		)
+		fmt.Println(err)
+		fmt.Println(resp.NickName)
+	}
+}
+
+func testAtta() {
+	for i := 1; i < 10; i++ {
+		atta.ReportBackendRequestStatus("", "", "",
+			"/api/v2/Login", "OK", 200, i)
+	}
+}
+
 func main() {
-	//fmt.Println(time.Now().Format(time.RFC3339))
+	fmt.Println(time.Now().Format(time.RFC3339))
+	fmt.Println(time.Now().Format(utils.TIMEFORMAT))
 	// testReadFile()
 	//testMap()
 	//testClaims()
@@ -343,5 +375,7 @@ func main() {
 	//test_QQDocs()
 	//testCombination()
 	//testPermuteString()
-	testShit()
+	//testShit()
+	//testSeeWo()
+	testAtta()
 }

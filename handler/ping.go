@@ -3,6 +3,7 @@ package handler
 import (
 	"ginfra/log"
 	"ginfra/prom"
+	"ginfra/protocol"
 
 	"github.com/gin-gonic/gin"
 )
@@ -11,8 +12,8 @@ import (
 func Ping(c *gin.Context) {
 	// set custom fileds into logger
 	log.Logger(c).Set(
-		log.CtxProductID, "cbd271dec6133d7065bb5391a105f6ea").Set(
-		log.CtxUserID, "0qkkoqm22idmnmsno203u4nljdsf9")
+		protocol.CtxProductID, "cbd271dec6133d7065bb5391a105f6ea").Set(
+		protocol.CtxUserID, "0qkkoqm22idmnmsno203u4nljdsf9")
 
 	prom.SearchCountInc(8000100)
 

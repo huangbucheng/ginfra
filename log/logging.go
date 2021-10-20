@@ -11,7 +11,8 @@ import (
 )
 
 var (
-	ZLog *zap.Logger
+	ZLog         *zap.Logger
+	CtxLoggerKey = "X-Logger"
 )
 
 //ContextLogger 日志封装

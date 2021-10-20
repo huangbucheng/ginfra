@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"ginfra/log"
+	"ginfra/protocol"
 
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
@@ -45,9 +46,9 @@ func ContextLogger(logger *zap.Logger) gin.HandlerFunc {
 				client_ip = forwarded_for[0]
 			}
 		}
-		c.Set(log.CtxClientIP, client_ip)
+		c.Set(protocol.CtxClientIP, client_ip)
 
-		ctxReqId, _ := c.Value(log.CtxRequestID).(string)
+		ctxReqId, _ := c.Value(protocol.CtxRequestID).(string)
 		l.Set("ClientIP", client_ip).Set("RequestID", ctxReqId)
 
 		c.Request = c.Request.WithContext(ctx)

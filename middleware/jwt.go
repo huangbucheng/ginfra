@@ -22,12 +22,14 @@ import (
 var (
 	RS256PublicKey  []byte = []byte{}
 	RS256PrivateKey []byte = []byte{}
-	cfg             *config.Config
+	JWTExpires      int64
+	JWTIssuer       string
+	HeaderTokenName string
+	CookieTokenName string
 )
 
 func init() {
-	var err error
-	cfg, err = config.Parse("")
+	cfg, err := config.Parse("")
 	if err != nil {
 		panic(err)
 	}
@@ -45,16 +47,25 @@ func init() {
 	if utils.Exists(publicKeyFile) && err != nil {
 		panic(fmt.Errorf("read public key file %s error:%s", publicKeyFile, err.Error()))
 	}
+
+	JWTExpires = cfg.GetInt64("jwt.jwtexpires")
+	JWTIssuer = cfg.GetString("jwt.jwtissuer")
+	cfg.SetDefault("jwt.headername", "token")
+	cfg.SetDefault("jwt.cookiename", "token")
+	HeaderTokenName = cfg.GetString("jwt.headername")
+	CookieTokenName = cfg.GetString("jwt.cookiename")
 }
 
+type HandleClaimFunc func(c *gin.Context, claims *utils.CustomClaims) error
+
 // JWTAuth 中间件，检查token
-func JWTAuth() gin.HandlerFunc {
+func JWTAuth(claimHandler HandleClaimFunc) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var err error
 		var token string
-		token = c.Request.Header.Get("token")
+		token = c.Request.Header.Get(HeaderTokenName)
 		if token == "" {
-			token, err = c.Cookie("tipe_token")
+			token, err = c.Cookie(CookieTokenName)
 			if err != nil {
 				log.WithGinContext(c).Error("JWTAuth no token")
 				protocol.SetErrResponse(c, errcode.NewCustomError(errcode.ErrNoAuthToken, "no auth token"))
@@ -79,7 +90,14 @@ func JWTAuth() gin.HandlerFunc {
 		}
 
 		// 解析到具体的claims相关信息
-		c.Set("claims", claims)
+		//c.Set("claims", claims)
+		err = claimHandler(c, claims)
+		if err != nil {
+			log.WithGinContext(c).Error("JWTAuth HandleClaimFunc exception", zap.String("error", err.Error()))
+			protocol.SetErrResponse(c, errcode.NewCustomError(errcode.ErrInvalidJWTClaims, err.Error()))
+			c.Abort()
+			return
+		}
 	}
 }
 
@@ -143,14 +161,14 @@ func NewJWT(key []byte) *JWT {
 // 新建一个CustomClaims
 func NewCustomClaims(data []byte, expires int64) *utils.CustomClaims {
 	if expires == 0 {
-		expires = cfg.GetInt64("jwt.jwtexpires")
+		expires = JWTExpires
 	}
 	return &utils.CustomClaims{
 		Data: data,
 		StandardClaims: jwt.StandardClaims{
 			NotBefore: jwt.At(time.Now().Add(-1 * time.Hour)),                       // 签名生效时间
 			ExpiresAt: jwt.At(time.Now().Add(time.Duration(expires) * time.Second)), // 签名过期时间
-			Issuer:    cfg.GetString("jwt.jwtissuer"),                               // 签名颁发者
+			Issuer:    JWTIssuer,                                                    // 签名颁发者
 		},
 	}
 }

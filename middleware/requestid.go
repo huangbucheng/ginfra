@@ -1,7 +1,7 @@
 package middleware
 
 import (
-	"ginfra/log"
+	"ginfra/protocol"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
@@ -11,7 +11,7 @@ import (
 func RequestId() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		// Check for incoming header, use it if exists
-		requestId := c.Request.Header.Get(log.CtxRequestID)
+		requestId := c.Request.Header.Get(protocol.CtxRequestID)
 
 		// Create request id with UUID4
 		if requestId == "" {
@@ -20,19 +20,10 @@ func RequestId() gin.HandlerFunc {
 		}
 
 		// Expose it for use in the application
-		c.Set(log.CtxRequestID, requestId)
+		c.Set(protocol.CtxRequestID, requestId)
 
 		// Set X-Request-Id header
-		c.Writer.Header().Set(log.CtxRequestID, requestId)
+		c.Writer.Header().Set(protocol.CtxRequestID, requestId)
 		c.Next()
 	}
-}
-
-//GetRequestId -
-func GetRequestId(c *gin.Context) string {
-	if ctxReqId, ok := c.Value(log.CtxRequestID).(string); ok {
-		return ctxReqId
-	}
-
-	return ""
 }

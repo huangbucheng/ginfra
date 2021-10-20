@@ -7,7 +7,10 @@ import (
 	"io/ioutil"
 	"net/http"
 	"os"
+	"os/user"
 	"path"
+	"path/filepath"
+	"strconv"
 	"strings"
 )
 
@@ -201,4 +204,32 @@ func AppendToFile(filename, content string) error {
 		return err
 	}
 	return nil
+}
+
+//ChownR 更改目录owner
+func ChownR(path string, user *user.User) error {
+	uid, _ := strconv.Atoi(user.Uid)
+	gid, _ := strconv.Atoi(user.Gid)
+
+	//err := os.Chown(path, uid, gid)
+	//return err
+	return filepath.Walk(path, func(name string, info os.FileInfo, err error) error {
+		if !IsDir(name) {
+			return nil
+		}
+		if err == nil {
+			err = os.Chown(name, uid, gid)
+		}
+		return err
+	})
+}
+
+//ChmodR 更改目录权限
+func ChmodR(path string, mode os.FileMode) error {
+	return filepath.Walk(path, func(name string, info os.FileInfo, err error) error {
+		if err == nil {
+			err = os.Chmod(name, mode)
+		}
+		return err
+	})
 }

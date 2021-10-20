@@ -37,7 +37,7 @@ type innerErrorResponse struct {
 func SetResponse(c *gin.Context, data interface{}) {
 	var innerResp map[string]interface{}
 	r := &innerResponse{
-		RequestId: utils.GetRequestId(c),
+		RequestId: GetRequestId(c),
 		Timestamp: time.Now().Unix(),
 	}
 
@@ -47,21 +47,22 @@ func SetResponse(c *gin.Context, data interface{}) {
 	jb, _ := json.Marshal(data)
 	utils.DecodeJsonWithInt64(jb, &innerResp)
 
-	var resp map[string]interface{}
-	resp = make(map[string]interface{})
+	resp := make(map[string]interface{})
 	resp["Response"] = innerResp
 
+	c.Set(CtxResponseCode, "OK")
 	c.JSON(http.StatusOK, resp)
 }
 
 //SetResponseData 设置gin的response
 func SetResponseData(c *gin.Context, data interface{}) {
 	r := &innerResponse{
-		RequestId: utils.GetRequestId(c),
+		RequestId: GetRequestId(c),
 		Data:      data,
 		Timestamp: time.Now().Unix(),
 	}
 
+	c.Set(CtxResponseCode, "OK")
 	c.JSON(http.StatusOK, r)
 }
 
@@ -78,10 +79,11 @@ func SetErrResponse(c *gin.Context, err error) {
 	}
 	r := &ErrorResponse{
 		Response: innerErrorResponse{
-			RequestId: utils.GetRequestId(c),
+			RequestId: GetRequestId(c),
 			Timestamp: time.Now().Unix(),
 			Error:     *cserr,
 		},
 	}
+	c.Set(CtxResponseCode, cserr.Code)
 	c.JSON(http.StatusOK, r)
 }

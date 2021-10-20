@@ -9,6 +9,8 @@ jwt:
   jwtexpires: 604800 # 7 * 24 * 3600
   RS256KeyDir: ../jwt/
   domain: .qq.com
+  headername: token
+  cookiename: token
 
 cors:
   origins:

@@ -2,6 +2,9 @@ package handler
 
 import (
 	"encoding/json"
+	"errors"
+	"fmt"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
@@ -20,8 +23,8 @@ type ClaimData struct {
 	IdentityType int
 }
 
-//GenerateToken 生成登录态token
-func GenerateToken(s *models.UserAuth) (string, error) {
+//generateToken 生成登录态token
+func generateToken(s *models.UserAuth) (string, error) {
 
 	// 构造SignKey: 签名和解签名需要使用一个值
 	// 构造用户claims信息(负荷)
@@ -31,7 +34,7 @@ func GenerateToken(s *models.UserAuth) (string, error) {
 		IdentityType: s.IdentityType,
 	}
 
-	// 根据claims生成token对象
+	// 根据claims生成token对象, expires = 0 表示将从配置文件中读取默认值
 	token, err := mw.GenerateToken(claimData, 0)
 	if err != nil {
 		return "", err
@@ -39,30 +42,56 @@ func GenerateToken(s *models.UserAuth) (string, error) {
 	return token, nil
 }
 
-//GetClaimData 从登录态token获取缓存信息
-func GetClaimData(claims *utils.CustomClaims) (*ClaimData, error) {
-	var data ClaimData
-	err := json.Unmarshal(claims.Data, &data)
+func HandleClaims(c *gin.Context, claims *utils.CustomClaims) error {
+	data, err := unmarshalClaimData(claims)
 	if err != nil {
-		return nil, protocol.ErrCodeInvalidClaims
+		return errors.New("登录态无效")
 	}
+
 	if data.Uid == 0 {
-		return nil, protocol.ErrCodeInvalidClaims
+		return errors.New("登录态无效")
 	}
-	return &data, nil
+
+	log.WithGinContext(c).Debug(fmt.Sprintf("claims: Uid=%d, Identifier=%s, IdentityType=%d",
+		data.Uid, data.Identifier, data.IdentityType))
+
+	c.Set("claims", data)
+	c.Set(protocol.CtxUserID, strconv.FormatUint(data.Uid, 10))
+	return nil
 }
 
-//getClaimDataFromContext 从登录态token获取缓存信息
-func getClaimDataFromContext(c *gin.Context) (*ClaimData, error) {
-	claims, ok := c.MustGet("claims").(*utils.CustomClaims)
+//getClaimData 从登录态token获取缓存信息
+func getClaimData(c *gin.Context) (*ClaimData, error) {
+	claims, ok := c.MustGet("claims").(*ClaimData)
+	if ok {
+		return claims, nil
+	}
+
+	customclaims, ok := c.MustGet("claims").(*utils.CustomClaims)
 	if !ok {
 		return nil, protocol.ErrCodeInvalidClaims
 	}
-
-	data, err := GetClaimData(claims)
+	data, err := unmarshalClaimData(customclaims)
 	if err != nil {
 		log.WithGinContext(c).Error(err.Error(), zap.String("error", protocol.ErrCodeInvalidClaims.Code))
+		return nil, protocol.ErrCodeInvalidClaims
 	}
 
-	return data, err
+	if data.Uid == 0 {
+		return nil, protocol.ErrCodeInvalidClaims
+	}
+
+	log.WithGinContext(c).Debug(fmt.Sprintf("claims: Uid=%d, Identifier=%s, IdentityType=%d",
+		data.Uid, data.Identifier, data.IdentityType))
+
+	return data, nil
+}
+
+func unmarshalClaimData(claims *utils.CustomClaims) (*ClaimData, error) {
+	var data ClaimData
+	err := json.Unmarshal(claims.Data, &data)
+	if err != nil {
+		return nil, err
+	}
+	return &data, nil
 }

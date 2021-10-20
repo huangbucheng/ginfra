@@ -10,10 +10,6 @@ import (
 	"regexp"
 	"strings"
 	"time"
-
-	"ginfra/log"
-
-	"github.com/gin-gonic/gin"
 )
 
 const TIMEFORMAT = "2006-01-02 15:04:05"
@@ -96,24 +92,6 @@ func GeneratePassword(length int) string {
 		buf[i], buf[j] = buf[j], buf[i]
 	})
 	return string(buf)
-}
-
-//GetRequestId 获取gin请求ID
-func GetRequestId(c *gin.Context) string {
-	if ctxReqId, ok := c.Value(log.CtxRequestID).(string); ok {
-		return ctxReqId
-	}
-
-	return ""
-}
-
-//GetClientIP 获取gin ClientIP
-func GetClientIP(c *gin.Context) string {
-	if ctxClientIP, ok := c.Value(log.CtxClientIP).(string); ok {
-		return ctxClientIP
-	}
-
-	return ""
 }
 
 // t, err = ParseWithLocation("Asia/Shanghai", "2020-07-29 15:04:05")
@@ -199,4 +177,11 @@ func ObscureName(name string) string {
 	}
 
 	return string(runeName[0]) + "*" + string(runeName[len(runeName)-1])
+}
+
+//TruncateString 截取一定长度字符串
+func TruncateString(raw string, length int) string {
+	runes := []rune(raw)
+	runeslen := len(runes)
+	return string(runes[:Min(length, runeslen)])
 }
